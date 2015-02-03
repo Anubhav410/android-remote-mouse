@@ -22,7 +22,7 @@ public class MyActivity extends Activity {
 
     public enum MouseEvents {
         Single_left_click , Double_left_click , Right_click
-        , Two_finger_touch , Three_finger_touch
+        , Two_finger_touch , Three_finger_touch , mouse_move_up , mouse_move_down , mouse_move_left , mouse_move_right
     }
     boolean one = false , two = false , move = false , three = false;
     @Override
@@ -57,7 +57,7 @@ public class MyActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-
+    int i = 0;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -71,11 +71,14 @@ public class MyActivity extends Activity {
 
         // get masked (not specific to a pointer) action
         int maskedAction = event.getActionMasked();
-
+        float currX = 0;
+        float currY = 0;
         switch (maskedAction) {
 
             case MotionEvent.ACTION_DOWN:
                 if(one == false){
+                    currX = event.getX();
+                    currY = event.getY();
                     one = true;
                 }
                 break;
@@ -91,8 +94,14 @@ public class MyActivity extends Activity {
 
                 break;
             }
-            case MotionEvent.ACTION_MOVE: { // a pointer was moved
+            case MotionEvent.ACTION_MOVE: {
                 move = true;
+                float temp_x = event.getX();
+                float temp_y = event.getY();
+                float dx = temp_x - currX;
+                float dy = temp_y - currY;
+                sendMouseEvent(MouseEvents.mouse_move_up);
+
                 break;
             }
             case MotionEvent.ACTION_UP:
@@ -124,7 +133,8 @@ public class MyActivity extends Activity {
                     else
                     {
                         Toast.makeText(this ,"1 fingers", Toast.LENGTH_SHORT).show();
-                        sendMouseEvent(MouseEvents.Single_left_click);
+//                        sendMouseEvent(MouseEvents.Single_left_click);
+                      //  sendMouseEvent(MouseEvents.mouse_move_up);
                     }
                 }
                 one = false;
@@ -159,7 +169,7 @@ This is a wrapper to either call SendMouseClickEvent or SendMouseDragEvent
 
     public void sendClickEvent(MouseEvents mE){
         try {
-            Socket sock = new Socket("10.252.244.203"  ,8080);
+            Socket sock = new Socket("192.168.1.5"  ,8080);
             DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
             BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 
